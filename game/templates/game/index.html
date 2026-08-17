@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tic Tac Toe</title>
+    <style>
+        :root {
+            --bg: #151821;
+            --panel: #1e2230;
+            --line: #333a4d;
+            --x-color: #5eead4;
+            --o-color: #f97316;
+            --text: #e8e9ee;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            color: var(--text);
+        }
+
+        .wrap {
+            text-align: center;
+        }
+
+        h1 {
+            letter-spacing: 2px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        #status {
+            margin-bottom: 20px;
+            font-size: 18px;
+            min-height: 24px;
+            color: #a8adbc;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 8px;
+            background: var(--line);
+            padding: 8px;
+            border-radius: 12px;
+        }
+
+        .cell {
+            background: var(--panel);
+            border: none;
+            border-radius: 8px;
+            font-size: 48px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background .15s ease;
+        }
+
+        .cell:hover:not(:disabled) {
+            background: #262c3d;
+        }
+
+        .cell:disabled {
+            cursor: default;
+        }
+
+        .cell.x {
+            color: var(--x-color);
+        }
+
+        .cell.o {
+            color: var(--o-color);
+        }
+
+        #reset {
+            margin-top: 20px;
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            background: var(--x-color);
+            color: #0f172a;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        #reset:hover {
+            opacity: .85;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <h1>TIC TAC TOE</h1>
+        <div id="status">Player X's turn</div>
+        <div class="board" id="board"></div>
+        <button id="reset">Restart</button>
+    </div>
+
+    <script>
+        const boardEl = document.getElementById('board');
+        const statusEl = document.getElementById('status');
+        const resetBtn = document.getElementById('reset');
+
+        let board = Array(9).fill(null);
+        let current = 'X';
+        let gameOver = false;
+
+        const wins = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
+
+        function renderBoard() {
+            boardEl.innerHTML = '';
+            board.forEach((val, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'cell' + (val ? ' ' + val.toLowerCase() : '');
+                btn.textContent = val || '';
+                btn.disabled = !!val || gameOver;
+                btn.addEventListener('click', () => makeMove(i));
+                boardEl.appendChild(btn);
+            });
+        }
+
+        function checkWinner() {
+            for (const [a, b, c] of wins) {
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    return board[a];
+                }
+            }
+            if (board.every(cell => cell)) return 'draw';
+            return null;
+        }
+
+        function makeMove(i) {
+            if (board[i] || gameOver) return;
+            board[i] = current;
+            const result = checkWinner();
+            if (result) {
+                gameOver = true;
+                statusEl.textContent = result === 'draw' ? "It's a draw!" : `Player ${result} wins!`;
+            } else {
+                current = current === 'X' ? 'O' : 'X';
+                statusEl.textContent = `Player ${current}'s turn`;
+            }
+            renderBoard();
+        }
+
+        resetBtn.addEventListener('click', () => {
+            board = Array(9).fill(null);
+            current = 'X';
+            gameOver = false;
+            statusEl.textContent = "Player X's turn";
+            renderBoard();
+        });
+
+        renderBoard();
+    </script>
+</body>
+
+</html>
